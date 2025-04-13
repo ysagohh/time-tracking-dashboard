@@ -5,7 +5,32 @@ const monthlyBtn = document.getElementById('monthly');
 
 // Fetch JSON data and populate DOM
 
+const determineHrsUnit = (item) => {
+    let units = new Array(0);
+    units.push(
+        (item.timeframes.daily.current === 1) ? 'hr' : 'hrs')
+    ;
+    units.push(
+        (item.timeframes.daily.previous === 1) ? 'hr' : 'hrs')
+    ;
+    units.push(
+        (item.timeframes.weekly.current === 1) ? 'hr' : 'hrs')
+    ;
+    units.push(
+        (item.timeframes.weekly.previous === 1) ? 'hr' : 'hrs')
+    ;
+    units.push(
+        (item.timeframes.monthly.current === 1) ? 'hr' : 'hrs')
+    ;
+    units.push(
+        (item.timeframes.monthly.previous === 1) ? 'hr' : 'hrs')
+    ;
+    return units;
+}
+
 const appendCard = (item) => {
+    const units = determineHrsUnit(item);
+
     const card = document.createElement('DIV');
     card.classList.add('card');
     card.setAttribute('id', item.title.toLowerCase().replace(/ /g, "-"))
@@ -18,16 +43,16 @@ const appendCard = (item) => {
         </div>
         <div>
             <div class="card__text__hours daily hidden">
-                <p class="current">${item.timeframes.daily.current}hrs</p>
-                <p class="previous">Yesterday - ${item.timeframes.daily.previous}hrs</p>
+                <p class="current">${item.timeframes.daily.current}${units[0]}</p>
+                <p class="previous">Yesterday - ${item.timeframes.daily.previous}${units[1]}</p>
             </div>
             <div class="card__text__hours weekly">
-                <p class="current">${item.timeframes.weekly.current}hrs</p>
-                <p class="previous">Last Week - ${item.timeframes.weekly.previous}hrs</p>
+                <p class="current">${item.timeframes.weekly.current}${units[2]}</p>
+                <p class="previous">Last Week - ${item.timeframes.weekly.previous}${units[3]}</p>
             </div>
             <div class="card__text__hours monthly hidden">
-                <p class="current">${item.timeframes.monthly.current}hrs</p>
-                <p class="previous">Last Month - ${item.timeframes.monthly.previous}hrs</p>
+                <p class="current">${item.timeframes.monthly.current}${units[4]}</p>
+                <p class="previous">Last Month - ${item.timeframes.monthly.previous}${units[5]}</p>
             </div>
         </div>
     </div>
