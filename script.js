@@ -1,30 +1,20 @@
 const container = document.getElementById('container');
-const dailyBtn = document.getElementById('daily');
-const weeklyBtn = document.getElementById('weekly');
-const monthlyBtn = document.getElementById('monthly');
+const buttons = document.getElementById('frequency').querySelectorAll('button');
 
 // Fetch JSON data and populate DOM
 
 const determineHrsUnit = (item) => {
     let units = new Array(0);
-    units.push(
-        (item.timeframes.daily.current === 1) ? 'hr' : 'hrs')
-    ;
-    units.push(
-        (item.timeframes.daily.previous === 1) ? 'hr' : 'hrs')
-    ;
-    units.push(
-        (item.timeframes.weekly.current === 1) ? 'hr' : 'hrs')
-    ;
-    units.push(
-        (item.timeframes.weekly.previous === 1) ? 'hr' : 'hrs')
-    ;
-    units.push(
-        (item.timeframes.monthly.current === 1) ? 'hr' : 'hrs')
-    ;
-    units.push(
-        (item.timeframes.monthly.previous === 1) ? 'hr' : 'hrs')
-    ;
+
+    for (const timeframe in item.timeframes) {
+        const frequency = item.timeframes[timeframe];
+        for (const hours in frequency) {
+            const hour = frequency[hours];
+            units.push(
+                (hour === 1) ? 'hr' : 'hrs')
+            ;
+        }
+    }
     return units;
 }
 
@@ -67,56 +57,51 @@ const populateDOM = (data) => {
 };
 
 fetch('./data.json').then((response) => {  
-    if(!response.ok) return console.log('Oops! Something went wrong.');
-    
+    if(!response.ok) return console.log('Failed to fetch data.json.');
     return response.json();
   }).then((data) => {
-   
     populateDOM(data);
 });
 
 
 // Handle "Daily", "Weekly", and "Monthly" buttons
 
-const toggleVisibility = (show, hide1, hide2) => {
+const toggleVisibility = (frequencies) => { // parameters: show, hide, hide
+    const show = document.querySelectorAll(`.${frequencies[0]}`);
+    const hide1 = document.querySelectorAll(`.${frequencies[1]}`);
+    const hide2 = document.querySelectorAll(`.${frequencies[2]}`);
+
     show.forEach(el => el.classList.remove('hidden'));
     hide1.forEach(el => el.classList.add('hidden'));
     hide2.forEach(el => el.classList.add('hidden'));
 }
 
-const setActiveButton = (active, inactive1, inactive2) => {
+const setActiveButton = (frequencies) => { // parameters: active, inactive, inactive
+    const active = document.getElementById(`${frequencies[0]}`);
+    const inactive1 = document.getElementById(`${frequencies[1]}`);
+    const inactive2 = document.getElementById(`${frequencies[2]}`);
+
     active.classList.add('active');
     inactive1.classList.remove('active');
     inactive2.classList.remove('active');
 }
 
-const dailyBtnHandler = () => {
-    const dailyData = document.querySelectorAll('.daily');
-    const weeklyData = document.querySelectorAll('.weekly');
-    const monthlyData = document.querySelectorAll('.monthly');
+const handleClick = (e) => {
+    let frequencies = new Array(0);
+    const frequency = e.target.id;
 
-    toggleVisibility(dailyData, weeklyData, monthlyData);
-    setActiveButton(dailyBtn, weeklyBtn, monthlyBtn);
-};
+    if (frequency === 'daily') {
+        frequencies = ['daily', 'weekly', 'monthly'];
+    } else if (frequency === 'weekly') {
+        frequencies = ['weekly', 'daily', 'monthly'];
+    } else if (frequency === 'monthly') {
+        frequencies = ['monthly', 'daily', 'weekly'];
+    }
 
-const weeklyBtnHandler = () => {
-    const dailyData = document.querySelectorAll('.daily');
-    const weeklyData = document.querySelectorAll('.weekly');
-    const monthlyData = document.querySelectorAll('.monthly');
+    toggleVisibility(frequencies);
+    setActiveButton(frequencies);
+}
 
-    toggleVisibility(weeklyData, dailyData, monthlyData);
-    setActiveButton(weeklyBtn, dailyBtn, monthlyBtn);
-};
-
-const monthlyBtnHandler = () => {
-    const dailyData = document.querySelectorAll('.daily');
-    const weeklyData = document.querySelectorAll('.weekly');
-    const monthlyData = document.querySelectorAll('.monthly');
-
-    toggleVisibility(monthlyData, dailyData, weeklyData);
-    setActiveButton(monthlyBtn, dailyBtn, weeklyBtn);
-};
-
-dailyBtn.addEventListener('click', dailyBtnHandler);
-weeklyBtn.addEventListener('click', weeklyBtnHandler);
-monthlyBtn.addEventListener('click', monthlyBtnHandler);
+buttons.forEach((button) => {
+    button.addEventListener('click', handleClick);
+  });
